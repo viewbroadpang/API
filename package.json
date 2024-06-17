@@ -1,8 +1,11 @@
 {
   "name": "express-mssql",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
+  "type": "module",
   "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,6 +16,8 @@
     "express": "^4.19.2",
     "mssql": "^10.0.2",
     "node-fetch": "^2.7.0",
-    "tedious": "^18.2.0"
+    "tedious": "^18.2.0",
+    "nodemon": "^2.0.22",
+    "cors": "^2.8.5"
   }
 }

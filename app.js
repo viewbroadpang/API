@@ -50,77 +50,90 @@ async function importDataToDB(jsonData) {
                 try {
                     for (const data of jsonData) {
                         await new Promise((resolve, reject) => {
-                            const request = new Request(`
-                                INSERT INTO Fact (photos, employeeCode, employeeCard, prefix, firstName, lastName, employeeName, prefixAlt, firstNameAlt, lastNameAlt, employeeNameAlt, nickName, joinDate, serviceDate, endProbationDate, endDate, quitReason, companyCode, company, establishmentCode, establishment, positionDate, jobroleCode, jobrole, positionCode, positionName, employeelevelCode, employeelevel, employeelevelNo, locationCode, location, organizationCode, organization, combinationCode, combination,  suppervisorCode, suppervisor, workEmails, workPhones, workAddresses, birthDate, homeEmails, homePhones, mobilePhones, homeAddresses, nationID, expiredate)
-                                VALUES (@value1, @value2, @value3, @value4, @value5, @value6, @value7, @value8, @value9, @value10, @value11, @value12, @value13, @valu14, @value15, @value16, @value17, @value18, @value19, @value20, @value21, @value22, @value23, @value24, @value25, @value26, @value27, @value28, @value29, @value30, @value31, @value32, @value33, @value34, @value35, @value36, @value37, @value38, @value39, @value40, @value41, @value42, @value43, @value44, @value45, @value46, @value47);
-
-                            `, err => {
+                            const checkRequest = new Request(`
+                                SELECT 1 FROM Fact WHERE nationID = @nationID
+                            `, (err, rowCount) => {
                                 if (err) {
-                                    console.error('Insert error:', err.message);
+                                    console.error('Check error:', err.message);
                                     reject(err);
                                     return;
                                 }
-                    
-                                console.log('Data inserted successfully');
-                                resolve();
+
+                                if (rowCount > 0) {
+                                    console.log('ข้อมูลซ้ำ ถ้าเจอข้อมูลซ้ำ if ส่วนนี้ก็เอาไว้เขียน update ข้อมูลแทนก็ได้');
+                                    resolve();
+                                } else {
+                                    const insertRequest = new Request(`
+                                        INSERT INTO Fact (photos, employeeCode, employeeCard, prefix, firstName, lastName, employeeName, prefixAlt, firstNameAlt, lastNameAlt, employeeNameAlt, nickName, joinDate, serviceDate, endProbationDate, endDate, quitReason, companyCode, company, establishmentCode, establishment, positionDate, jobroleCode, jobrole, positionCode, positionName, employeelevelCode, employeelevel, employeelevelNo, locationCode, location, organizationCode, organization, combinationCode, combination, suppervisorCode, suppervisor, workEmails, workPhones, workAddresses, birthDate, homeEmails, homePhones, mobilePhones, homeAddresses, nationID, expiredate)
+                                        VALUES (@photos, @employeeCode, @employeeCard, @prefix, @firstName, @lastName, @employeeName, @prefixAlt, @firstNameAlt, @lastNameAlt, @employeeNameAlt, @nickName, @joinDate, @serviceDate, @endProbationDate, @endDate, @quitReason, @companyCode, @company, @establishmentCode, @establishment, @positionDate, @jobroleCode, @jobrole, @positionCode, @positionName, @employeelevelCode, @employeelevel, @employeelevelNo, @locationCode, @location, @organizationCode, @organization, @combinationCode, @combination, @suppervisorCode, @suppervisor, @workEmails, @workPhones, @workAddresses, @birthDate, @homeEmails, @homePhones, @mobilePhones, @homeAddresses, @nationID, @expiredate);
+                                    `, err => {
+                                        if (err) {
+                                            console.error('Insert error:', err.message);
+                                            reject(err);
+                                            return;
+                                        }
+                                        console.log('Data inserted successfully');
+                                        resolve();
+                                    });
+
+                                    insertRequest.addParameter('photos', TYPES.VarChar, data["photos"]);
+                                    insertRequest.addParameter('employeeCode', TYPES.VarChar, data["employeeCode"]);
+                                    insertRequest.addParameter('employeeCard', TYPES.VarChar, data["employeeCard"]);
+                                    insertRequest.addParameter('prefix', TYPES.VarChar, data["prefix"]);
+                                    insertRequest.addParameter('firstName', TYPES.VarChar, data["firstName"]);
+                                    insertRequest.addParameter('lastName', TYPES.VarChar, data["lastName"]);
+                                    insertRequest.addParameter('employeeName', TYPES.VarChar, data["employeeName"]);
+                                    insertRequest.addParameter('prefixAlt', TYPES.VarChar, data["prefixAlt"]);
+                                    insertRequest.addParameter('firstNameAlt', TYPES.VarChar, data["firstNameAlt"]);
+                                    insertRequest.addParameter('lastNameAlt', TYPES.VarChar, data["lastNameAlt"]);
+                                    insertRequest.addParameter('employeeNameAlt', TYPES.VarChar, data["employeeNameAlt"]);
+                                    insertRequest.addParameter('nickName', TYPES.VarChar, data["nickName"]);
+                                    insertRequest.addParameter('joinDate', TYPES.DateTime, data["endDate"] ? new Date(data["joinDate"]) : null);
+                                    insertRequest.addParameter('serviceDate', TYPES.DateTime, data["endDate"] ? new Date(data["serviceDate"]) : null);
+                                    insertRequest.addParameter('endProbationDate', TYPES.DateTime, data["endDate"] ? new Date(data["endProbationDate"]) : null);
+                                    insertRequest.addParameter('endDate', TYPES.DateTime, data["endDate"] ? new Date(data["endDate"]) : null);
+                                    insertRequest.addParameter('quitReason', TYPES.VarChar, data["quitReason"]);
+                                    insertRequest.addParameter('companyCode', TYPES.VarChar, data["companyCode"]);
+                                    insertRequest.addParameter('company', TYPES.VarChar, data["company"]);
+                                    insertRequest.addParameter('establishmentCode', TYPES.VarChar, data["establishmentCode"]);
+                                    insertRequest.addParameter('establishment', TYPES.VarChar, data["establishment"]);
+                                    insertRequest.addParameter('positionDate', TYPES.DateTime, data["positionDate"] ? new Date(data["positionDate"]) : null);
+                                    insertRequest.addParameter('jobroleCode', TYPES.VarChar, data["jobroleCode"]);
+                                    insertRequest.addParameter('jobrole', TYPES.VarChar, data["jobrole"]);
+                                    insertRequest.addParameter('positionCode', TYPES.VarChar, data["positionCode"]);
+                                    insertRequest.addParameter('positionName', TYPES.VarChar, data["positionName"]);
+                                    insertRequest.addParameter('employeelevelCode', TYPES.VarChar, data["employeelevelCode"]);
+                                    insertRequest.addParameter('employeelevel', TYPES.VarChar, data["employeelevel"]);
+                                    insertRequest.addParameter('employeelevelNo', TYPES.Int, data["employeelevelNo"]);
+                                    insertRequest.addParameter('locationCode', TYPES.VarChar, data["locationCode"]);
+                                    insertRequest.addParameter('location', TYPES.VarChar, data["location"]);
+                                    insertRequest.addParameter('organizationCode', TYPES.VarChar, data["organizationCode"]);
+                                    insertRequest.addParameter('organization', TYPES.VarChar, data["organization"]);
+                                    insertRequest.addParameter('combinationCode', TYPES.VarChar, data["combinationCode"]);
+                                    insertRequest.addParameter('combination', TYPES.VarChar, data["combination"]);
+                                    insertRequest.addParameter('suppervisorCode', TYPES.VarChar, data["suppervisorCode"]);
+                                    insertRequest.addParameter('suppervisor', TYPES.VarChar, data["suppervisor"]);
+                                    insertRequest.addParameter('workEmails', TYPES.VarChar, data["workEmails"]);
+                                    insertRequest.addParameter('workPhones', TYPES.VarChar, data["workPhones"]);
+                                    insertRequest.addParameter('workAddresses', TYPES.VarChar, data["workAddresses"]);
+                                    insertRequest.addParameter('birthDate', TYPES.DateTime, data["birthDate"] ? new Date(data["birthDate"]) : null);
+                                    insertRequest.addParameter('homeEmails', TYPES.VarChar, data["homeEmails"]);
+                                    insertRequest.addParameter('homePhones', TYPES.VarChar, data["homePhones"]);
+                                    insertRequest.addParameter('mobilePhones', TYPES.VarChar, data["mobilePhones"]);
+                                    insertRequest.addParameter('homeAddresses', TYPES.VarChar, data["homeAddresses"]);
+                                    insertRequest.addParameter('nationID', TYPES.Int, data["nationID"]);
+                                    insertRequest.addParameter('expiredate', TYPES.DateTime, data["expiredate"] ? new Date(data["expiredate"]) : null);
+
+                                    connection.execSql(insertRequest);
+                                }
                             });
-                    
-                            request.addParameter('value1', TYPES.Image, data["photos"]);
-                            request.addParameter('value2', TYPES.VarChar, data["employeeCode"]);
-                            request.addParameter('value3', TYPES.VarChar, data["employeeCard"]);
-                            request.addParameter('value4', TYPES.VarChar, data["prefix"]);
-                            request.addParameter('value5', TYPES.VarChar, data["firstName"]);
-                            request.addParameter('value6', TYPES.VarChar, data["lastName"]);
-   			    request.addParameter('value7', TYPES.VarChar, data["employeeName"]);
-                            request.addParameter('value8', TYPES.VarChar, data["prefixAlt"]);
-                            request.addParameter('value9', TYPES.VarChar, data["firstNameAlt"]);
-                            request.addParameter('value10', TYPES.VarChar, data["lastNameAlt"]);
-                            request.addParameter('value11', TYPES.VarChar, data["employeeNameAlt"]);
-			    request.addParameter('value12', TYPES.VarChar, data["nickName"]);
-                            request.addParameter('value13', TYPES.Int, data["joinDate"]);
-                            request.addParameter('value14', TYPES.Int, data["serviceDate"]);
-                            request.addParameter('value15', TYPES.Int, data["endProbationDate"]);
-                            request.addParameter('value16', TYPES.Int, data["endDate"]);
-			    request.addParameter('value17', TYPES.VarChar, data["quitReason"]);
-                            request.addParameter('value18', TYPES.VarChar, data["companyCode"]);
-                            request.addParameter('value19', TYPES.VarChar, data["company"]);
-                            request.addParameter('value20', TYPES.VarChar, data["establishmentCode"]);
-                            request.addParameter('value21', TYPES.VarChar, data["establishment"]);
-			    request.addParameter('value22', TYPES.Int, data["positionDate"]);
-                            request.addParameter('value23', TYPES.VarChar, data["jobroleCode"]);
-                            request.addParameter('value24', TYPES.VarChar, data["jobrole"]);
-                            request.addParameter('value25', TYPES.VarChar, data["positionCode"]);
-                            request.addParameter('value26', TYPES.VarChar, data["positionName"]);
-			    request.addParameter('value27', TYPES.VarChar, data["employeelevelCode"]);
-                            request.addParameter('value28', TYPES.VarChar, data["employeelevel"]);
-                            request.addParameter('value29', TYPES.Int, data["employeelevelNo"]);
-                            request.addParameter('value30', TYPES.VarChar, data["locationCode"]);
-                            request.addParameter('value31', TYPES.VarChar, data["location"]);
-			    request.addParameter('value32', TYPES.VarChar, data["organizationCode"]);
-                            request.addParameter('value33', TYPES.VarChar, data["organization"]);
-                            request.addParameter('value34', TYPES.VarChar, data["combinationCode"]);
-                            request.addParameter('value35', TYPES.VarChar, data["combination"]);
-                            request.addParameter('value36', TYPES.VarChar, data["suppervisorCode"]);
-			    request.addParameter('value37', TYPES.VarChar, data["suppervisor"]);
-                            request.addParameter('value38', TYPES.VarChar, data["workEmails"]);
-                            request.addParameter('value39', TYPES.Int, data["workPhones"]);
-                            request.addParameter('value40', TYPES.VarChar, data["workAddresses"]);
-                            request.addParameter('value41', TYPES.Int, data["birthDate"]);
-			    request.addParameter('value42', TYPES.VarChar, data["homeEmails"]);
-                            request.addParameter('value43', TYPES.Int, data["homePhones"]);
-                            request.addParameter('value44', TYPES.Int, data["mobilePhones"]);
-                            request.addParameter('value45', TYPES.VarChar, data["homeAddresses"]);
- 			    request.addParameter('value46', TYPES.Int, data["nationID"]);
-                            request.addParameter('value47', TYPES.VarChar, data["expiredate"]);
-                    
-                            connection.execSql(request);
-                            
-                        }); 
+                            checkRequest.addParameter('nationID', TYPES.Int, data["nationID"]);
+
+                            connection.execSql(checkRequest);
+                        });
                     }
-                    
-                    // Close connection outside the loop
                     connection.close();
-                     
+
                 } catch (error) {
                     console.error('Error during SQL execution:', error.message);
                     reject(error);
@@ -143,25 +156,41 @@ async function importDataToDB(jsonData) {
 
 app.get('/fetch-and-save', async (req, res) => {
     try {
-        const url = 'https://sabas.eunite.com/eunite/webservices/employees?dateV=01-04-2022&page=1&size=10';
-        const username = 'sa.trial_sabas01@eunite.com';  // Replace with your API username
-        const password = 'eUniteDemo@2023';  // Replace with your API password
-        const encodedCredentials = Buffer.from(`${username}:${password}`).toString('base64');
-        
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Basic ${encodedCredentials}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch data');
-        }
+        let results = []
+        let page = 1
+        let totalPage = 0
+        do {
 
-        const jsonData = await response.json();
-        await importDataToDB(jsonData.data); // Pass jsonData to importDataToDB function
-        res.status(200).json({ results: jsonData });
+            const url = `https://sabas.eunite.com/eunite/webservices/employees?dateV=01-04-2022&page=${page}&size=10`;
+            const username = 'sa.trial_sabas01@eunite.com';  // Replace with your API username
+            const password = 'eUniteDemo@2023';  // Replace with your API password
+            const encodedCredentials = Buffer.from(`${username}:${password}`).toString('base64');
+
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Basic ${encodedCredentials}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                page = totalPage
+                throw new Error('Failed to fetch data');
+            }
+
+            const jsonData = await response.json();
+            if (jsonData.result.length > 0) {
+                results = [...results, ...jsonData.result]
+                totalPage = jsonData.totalPage
+                console.log("results", results)
+            } else {
+                break;
+            }
+
+            page++
+        } while (page != totalPage);
+
+        await importDataToDB(jsonData.data);
+        res.status(200).json({ results });
     } catch (error) {
         console.error('Error:', error.message);
         res.status(500).send('An error occurred');
